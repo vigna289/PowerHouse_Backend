@@ -8,7 +8,7 @@ const categorySchema= new mongoose.Schema({
     },
     parentCategory:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"categories",
+        ref:'categories',
     },
     level:{
         type:Number,

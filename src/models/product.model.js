@@ -32,6 +32,7 @@ const productSchema= new mongoose.Schema({
     }],
     imageUrl:{
         type:String,
+        required:true,
     },
     reviews:[
         {
@@ -39,11 +40,12 @@ const productSchema= new mongoose.Schema({
             ref:'reviews',
        },
     ],
-  category: {
-    topLevel: { type: mongoose.Schema.Types.ObjectId, ref: "categories" },
-    secondLevel: { type: mongoose.Schema.Types.ObjectId, ref: "categories" },
-    thirdLevel: { type: mongoose.Schema.Types.ObjectId, ref: "categories" }
-  },
+category: {
+  topLevel: { type: mongoose.Schema.Types.ObjectId, ref: 'categories' },
+  secondLevel: { type: mongoose.Schema.Types.ObjectId, ref: 'categories' },
+  thirdLevel: { type: mongoose.Schema.Types.ObjectId, ref: 'categories' }
+},
+
     createdAt:{
         type:Date,
         default:Date.now(),

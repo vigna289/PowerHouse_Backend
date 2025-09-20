@@ -54,7 +54,7 @@ async function createProduct(reqData)
         imageUrl : reqData.imageUrl,
         brand : reqData.brand,
         price : reqData.price,
-        sizes : reqData.sizes,
+        sizes : reqData.size,
         quantity : reqData.quantity,
           category: {
     topLevel: topLevel._id,
@@ -96,83 +96,98 @@ async function findProductById(id) {
 }
 
 
-async function getAllProducts(reqData)
-{
-    let {category,color,sizes,minPrice,maxPrice,minDiscount,sort,stock,pageNumber,pageSize}
-    = reqData;
+async function getAllProducts(reqData) {
+  let { category, color, sizes, minPrice, maxPrice, minDiscount, sort, stock, pageNumber, pageSize } = reqData;
 
-    pageSize = pageSize || 10;
+  pageSize = parseInt(pageSize) || 10;
+  pageNumber = parseInt(pageNumber) || 0;
+  minPrice = Number(minPrice) || 0;
+  maxPrice = Number(maxPrice) || 0;
+  minDiscount = Number(minDiscount) || 0;
+  color = color && color !== "undefined" ? color : "";
+  sizes = sizes && sizes !== "undefined" ? sizes : "";
+  stock = stock && stock !== "null" ? stock : null;
 
-    let query = Product.find().populate("category");
+  let filter = {};
 
-    if(category)
-    {
-        const existCategory = await Category.findOne({name:category});
-        if(existCategory)
-        {
-            query=query.where("category").equals(existCategory._id);
-        }
-        else
-        {
-            return {content:[],currentPage:1,totalPages:0}
-        }
+  // Category filter
+  if (category) {
+    const existCategory = await Category.findOne({
+      name: { $regex: `^${category}$`, $options: "i" }, level:3
+    });
+
+    console.log("ExistCategory:", existCategory);
+
+    if (existCategory) {
+      filter.$or = [
+        { "category.topLevel": existCategory._id },
+        { "category.secondLevel": existCategory._id },
+        { "category.thirdLevel": existCategory._id },
+      ];
+    } else {
+      return { content: [], currentPage: 1, totalPages: 0 };
     }
+  }
 
-    if(color)
-    {
-        const colorSet = new Set(color.split(",").map(color=>color.trim().toLowerCase()));
+  // Color filter
+  if (color) {
+    const colorSet = new Set(color.split(",").map(c => c.trim().toLowerCase()));
+    const colorRegex = new RegExp([...colorSet].join("|"), "i");
+    filter.color = colorRegex;
+  }
 
-        const colorRegex = colorSet.size>0 ? new RegExp([...colorSet].join("|"),"i"):null;
+  // Sizes filter
+  if (sizes) {
+    const sizesSet = new Set(sizes.split(",").map(s => s.trim()));
+    filter["sizes.name"] = { $in: [...sizesSet] };
+  }
 
-        query = query.where("color").regex(colorRegex);
-    }
-    if(sizes)
-    {
-        const sizesSet = new Set(sizes);
+  // Price filter
+  if (minPrice || maxPrice) {
+    filter.discountedPrice = {};
+    if (minPrice) filter.discountedPrice.$gte = minPrice;
+    if (maxPrice > 0) filter.discountedPrice.$lte = maxPrice;
+  }
 
-        query = query.where("sizes.name").in([...sizesSet]);
-    }
+  // Discount filter
+  if (minDiscount) {
+    filter.discountPersent = { $gte: minDiscount };
+  }
 
-    if(minPrice && maxPrice)
-    {
-        query = await query.where('discountedPrice').gte(minPrice).filter(maxPrice);
-    }
+  // Stock filter
+  if (stock) {
+    if (stock === "in_stock") filter.quantity = { $gt: 0 };
+    else if (stock === "out_of_stock") filter.quantity = { $lte: 0 };
+  }
 
-    if(minDiscount)
-    {
-        query = (await query.where("discountPersent")).length(minDiscount);
-    }
+  console.log("Final Filter:", filter);
 
-    if(stock)
-    {
-        if(stock == "in_stock")
-        {
-            query = query.where("quantity").gt(0)
-        }
-        else if(stock == "out_of_stock")
-        {
-            query = query.where("quantity").gt(1)
-        }
-    }
+  const total = await Product.countDocuments(filter);
 
-    if(sort)
-    {
-        const sortDirection = sort=== "price_height"?-1:1;
-        query = query.sort({discountedPrice:sortDirection})
-    }
+  let query = Product.find(filter)
+    .populate("category.topLevel")
+    .populate("category.secondLevel")
+    .populate("category.thirdLevel");
 
-    const totalProducts = await Product.countDocuments(query);
+  // Sorting
+  if (sort === "price_low") query = query.sort({ discountedPrice: 1 });
+  if (sort === "price_high") query = query.sort({ discountedPrice: -1 });
 
-    const skip=(pageNumber-1)*pageSize;
+  const products = await query.skip(pageNumber * pageSize).limit(pageSize);
 
-    query=query.skip(skip).limit(pageSize);
+  console.log("Products fetched:", products.length);
+  products.forEach(p => console.log(p.imageUrl));
 
-    const products = await query.exec();
 
-    const totalPages = Math.ceil(totalProducts/pageSize);
 
-    return {content:products,currentPage:pageNumber,totalPages:totalPages}
+  return {
+    content: products,
+    currentPage: pageNumber + 1,
+    totalPages: Math.ceil(total / pageSize),
+  };
 }
+
+
 
 async function createMultipleProduct(products)
 {

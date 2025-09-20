@@ -1,4 +1,15 @@
 const productService= require("../services/product.service.js")
+const Category = require("../models/category.model.js");
+
+const getAllCategories = async (req, res) => {
+  try {
+    const categories = await Category.find({});
+    res.status(200).send(categories);
+  } catch (error) {
+    res.status(500).send({ error: err.message });
+  }
+};
+
 const createProduct = async (req,res) =>{
     try
     {
@@ -50,6 +61,7 @@ const getAllProducts = async (req,res) =>{
     const productId=req.params.id;
     try
     {
+          console.log("Query received:", req.query);
         const products = await productService.getAllProducts(req.query);
         return res.status(201).send(products);
     }
@@ -78,4 +90,5 @@ module.exports={
     getAllProducts,
     createMultipleProduct,
     findProductById,
+    getAllCategories,
 }
