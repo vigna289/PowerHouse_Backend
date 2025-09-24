@@ -55,7 +55,11 @@ const getUserProfileByToken = async (token) => {
     try {
         const userId = jwtProvider.getUserIdFromToken(token);
 
-        const user = await findUserById(userId)
+        const user = await User.findById(userId)
+            .populate({
+                path: "address", // assuming 'address' is the field in User model
+                select: "-user"  // exclude user reference inside address
+            });
 
         if (!user) {
             throw new Error("user not found with id : ", userId)
