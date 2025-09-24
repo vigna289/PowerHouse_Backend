@@ -1,98 +1,48 @@
-// const express=require("express")
+const express=require("express")
 
-// const cors=require("cors")
+const cors=require("cors")
 
 
-// const app=express()
+const app=express()
 
-// app.use(express.json())
-// app.use(cors())
+app.use(express.json())
+app.use(cors())
 
-// app.get("/",(req,res)=>{
-//     return res.status(200).send({message : "welcome to ecommerce api - node",status:true})
-// })
+app.get("/",(req,res)=>{
+    return res.status(200).send({message : "welcome to ecommerce api - node",status:true})
+})
 
-// const authRouters = require("./routes/auth.route.js")
-// app.use("/auth",authRouters );
-
-// const userRouters = require("./routes/user.route.js");
-// app.use("/api/users",userRouters);
-
-// const productRouter = require("./routes/product.routes.js")
-// app.use("/api/products",productRouter);
-
-// const adminProductRouter = require("./routes/adminProduct.routes.js")
-// app.use("/api/admin/products",adminProductRouter)
-
-// const cartRouter = require("./routes/cart.routes.js")
-// app.use("/api/cart",cartRouter)
-
-// const cartItemRouter = require("./routes/cartItem.routes.js")
-// app.use("/api/cart_items",cartItemRouter)
-
-// const orderRouter = require("./routes/order.routes.js")
-// app.use("/api/orders",orderRouter)
-
-// const adminOrderRouter = require("./routes/adminOrder.routes.js")
-// app.use("/api/admin/orders",adminOrderRouter)
-
-// const reviewRouter = require("./routes/review.routes.js")
-// app.use("/api/reviews",reviewRouter)
-
-// const ratingRouter = require("./routes/rating.routes.js")
-// app.use("/api/ratings",ratingRouter);
-
-// const paymentRouter = require("./routes/payment.routes.js")
-// app.use("/api/payments",paymentRouter);
-
-// module.exports=app;
-const express = require("express");
-const cors = require("cors");
-
-const app = express();
-
-app.use(express.json());
-app.use(cors());
-
-app.get("/", (req, res) => {
-  return res.status(200).send({ message: "welcome to ecommerce api - node", status: true });
-});
-
-// Routers
-const authRouters = require("./routes/auth.route.js");
-app.use("/auth", authRouters);
+const authRouters = require("./routes/auth.route.js")
+app.use("/auth",authRouters );
 
 const userRouters = require("./routes/user.route.js");
-app.use("/api/users", userRouters);
+app.use("/api/users",userRouters);
 
-const productRouter = require("./routes/product.routes.js");
-app.use("/api/products", productRouter);
+const productRouter = require("./routes/product.routes.js")
+app.use("/api/products",productRouter);
 
-const adminProductRouter = require("./routes/adminProduct.routes.js");
-app.use("/api/admin/products", adminProductRouter);
+const adminProductRouter = require("./routes/adminProduct.routes.js")
+app.use("/api/admin/products",adminProductRouter)
 
-const cartRouter = require("./routes/cart.routes.js");
-app.use("/api/cart", cartRouter);
+const cartRouter = require("./routes/cart.routes.js")
+app.use("/api/cart",cartRouter)
 
-const cartItemRouter = require("./routes/cartItem.routes.js");
-app.use("/api/cart_items", cartItemRouter);
+const cartItemRouter = require("./routes/cartItem.routes.js")
+app.use("/api/cart_items",cartItemRouter)
 
-const orderRouter = require("./routes/order.routes.js");
-app.use("/api/orders", orderRouter);
+const orderRouter = require("./routes/order.routes.js")
+app.use("/api/orders",orderRouter)
 
-const adminOrderRouter = require("./routes/adminOrder.routes.js");
-app.use("/api/admin/orders", adminOrderRouter);
+const adminOrderRouter = require("./routes/adminOrder.routes.js")
+app.use("/api/admin/orders",adminOrderRouter)
 
-const reviewRouter = require("./routes/review.routes.js");
-app.use("/api/reviews", reviewRouter);
+const reviewRouter = require("./routes/review.routes.js")
+app.use("/api/reviews",reviewRouter)
 
-const ratingRouter = require("./routes/rating.routes.js");
-app.use("/api/ratings", ratingRouter);
+const ratingRouter = require("./routes/rating.routes.js")
+app.use("/api/ratings",ratingRouter);
 
-const paymentRouter = require("./routes/payment.routes.js");
-app.use("/api/payments", paymentRouter);
+const paymentRouter = require("./routes/payment.routes.js")
+app.use("/api/payments",paymentRouter);
 
-const { connectDb } = require("./Config/db");
-connectDb();
-
-module.exports = app;
+module.exports=app;
