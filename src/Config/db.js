@@ -13,7 +13,10 @@ const mongoose = require("mongoose");
 const mongodbUrl = process.env.MONGODB_URL;
 
 const connectDb = () => {
-  return mongoose.connect(mongodbUrl);
+  return mongoose.connect(mongodbUrl, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
 };
 
 module.exports = { connectDb };
